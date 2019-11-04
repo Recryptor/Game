@@ -7,81 +7,109 @@ class Game < Gosu::Window
         super 1920, 1080
         self.caption = "Tutorial Game"
         @background_image = Gosu::Image.new("media2/background2.jpg", :tileable => true)
+        @background_image2 = Gosu::Image.new("media2/background.jpg", :tileable => true)
+        @background_image3 = Gosu::Image.new("media2/background3.png", :tileable => true)
+        @background_image4 = Gosu::Image.new("media2/background4.png", :tileable => true)
+        
         @image = Gosu::Image.new("media2/redCharacter.png")
+        start
+    end
+    def start
         @players = Array.new
         @bomb = Array.new
         @players.push(Player.new)
         @players.push(Player.new)
-        
+        @endscreen = Endscreen.new
         @players.each do |p|
             p.warp(960, 875)
         end
+        @background = rand(2)
         @players[0].warp(960, 875)
         @money = Array.new
         @money5 = Array.new
         @font = Gosu::Font.new(20)
-        
     end
 
     def update
-        if Gosu.button_down? Gosu::KB_A
-            @players[1].move_left
-        end
-        if Gosu.button_down? Gosu::KB_S
-            @players[1].move_right
-        end
+        if @players.size == 2 
+            if Gosu.button_down? Gosu::KB_A
+                @players[1].move_left
+            end
+            if Gosu.button_down? Gosu::KB_S
+                @players[1].move_right
+            end
+            
+            if Gosu.button_down? Gosu::KB_K
+                @players[0].move_left
+            end
+            if Gosu.button_down? Gosu::KB_L
+                @players[0].move_right
+            end
         
-        if Gosu.button_down? Gosu::KB_K
-            @players[0].move_left
+            
+            if rand(100) <= 1 && @money.size <= 15
+                @money.push(Money.new)
+            end
+            if rand(100) <= 1 && @money.size <= 15
+                @money5.push(Money5.new)
+            end
+            if rand(100) <= 1
+                @bomb.push(Bomb.new)
+            end
+            @players.each do |p|
+                p.move
+            end
+            @money.each do |p|
+                p.move
+            end
+            @money5.each do |p|
+                p.move
+            end
+            @bomb.each do |p|
+                p.move
+            end
+            @players.each do |p|
+                p.delete(@money)
+            end
+            @players.each do |p|
+                p.delete5(@money5)
+            end
+            @bomb.each do |p|
+                p.kill_player(@players)
+            end
+        else
+            if Gosu.button_down? Gosu::KB_R
+                start
+            end 
         end
-        if Gosu.button_down? Gosu::KB_L
-            @players[0].move_right
-        end
-        
-        
-        if rand(100) <= 1 && @money.size <= 15
-            @money.push(Money.new)
-        end
-        if rand(100) <= 1 && @money.size <= 15
-            @money5.push(Money5.new)
-        end
-        if rand(100) <= 1
-            @bomb.push(Bomb.new)
-        end
-        @players.each do |p|
-            p.move
-        end
-        @money.each do |p|
-            p.move
-        end
-        @money5.each do |p|
-            p.move
-        end
-        @bomb.each do |p|
-            p.move
-        end
-        @players.each do |p|
-            p.delete(@money)
-        end
-        @players.each do |p|
-            p.delete5(@money5)
-        end
-        @bomb.each do |p|
-            p.kill_player(@players)
-        end
-    end
-        
+    end    
 
     def draw
-        fx = 1920.0/@background_image.width
-        fy = 1080.0/@background_image.height
-        @background_image.draw(0, 0, ZOrder::BACKGROUND, fx, fy)
-        @players.each { |player| player.draw}
-        @money.each { |money| money.draw}
-        @money5.each { |money5| money5.draw}
-        @bomb.each { |bomb| bomb.draw}
-        @players.size.times do |i|
-            @font.draw_text("Score: #{@players[i].score}", 10, (10 * i), ZOrder::UI, 1.0, 1.0, Gosu::Color::YELLOW)
+        if @players.size == 2
+            fx = 1920.0/@background_image.width
+            fy = 1080.0/@background_image.height
+            fx2 = 1920.0/@background_image2.width
+            fy2 = 1080.0/@background_image2.height
+
+            if @background == 1
+                @background_image.draw(0, 0, ZOrder::BACKGROUND, fx, fy)
+            end
+            if @background == 2
+                @background_image2.draw(0, 0, ZOrder::BACKGROUND, fx2, fy2)
+            end
+            @players.each { |player| player.draw}
+            @money.each { |money| money.draw}
+            @money5.each { |money5| money5.draw}
+            @bomb.each { |bomb| bomb.draw}
+            @players.size.times do |i|
+                @font.draw_text("Score: #{@players[i].score}", 10, (10 * i), ZOrder::UI, 1.0, 1.0, Gosu::Color::YELLOW)
+            end
+        else
+            fx = 1920.0/@background_image4.width
+            fy = 1080.0/@background_image4.height
+            @endscreen.draw
+            @background_image4.draw(0, 0, ZOrder::BACKGROUND, fx, fy)
+
         end
     end
 end
@@ -222,6 +250,17 @@ class Bomb
                 false
             end
         end
+    end
+end
+
+class Endscreen
+    def initialize
+        @image = Gosu::Image.new("media2/game_over.png")
+        @x = 420
+        @y = 0
+    end
+    def draw
+        @image.draw(@x, @y, 1)
     end
 end
 
