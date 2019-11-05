@@ -23,7 +23,7 @@ class Game < Gosu::Window
         @players.each do |p|
             p.warp(960, 875)
         end
-        @background = rand(2)
+        @background = 1
         @players[0].warp(960, 875)
         @money = Array.new
         @money5 = Array.new
@@ -88,15 +88,15 @@ class Game < Gosu::Window
         if @players.size == 2
             fx = 1920.0/@background_image.width
             fy = 1080.0/@background_image.height
-            fx2 = 1920.0/@background_image2.width
-            fy2 = 1080.0/@background_image2.height
+            #fx2 = 1920.0/@background_image2.width
+            #fy2 = 1080.0/@background_image2.height
 
             if @background == 1
                 @background_image.draw(0, 0, ZOrder::BACKGROUND, fx, fy)
             end
-            if @background == 2
-                @background_image2.draw(0, 0, ZOrder::BACKGROUND, fx2, fy2)
-            end
+            #if @background == 2
+            #    @background_image2.draw(0, 0, ZOrder::BACKGROUND, fx2, fy2)
+            #end
             @players.each { |player| player.draw}
             @money.each { |money| money.draw}
             @money5.each { |money5| money5.draw}
